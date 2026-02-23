@@ -1,0 +1,30 @@
+/* src/index.css */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* 定义你的主题色 */
+  --bg-color: #0B1E13;
+  /* 深邃森林绿 */
+  --accent-color: #FF9F43;
+  /* 日落橙 */
+  --text-color: #ffffff;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+  /* 防止左右晃动 */
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* 隐藏滚动条但保留滚动功能（可选，为了美观） */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}

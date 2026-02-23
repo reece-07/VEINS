@@ -1,0 +1,417 @@
+body {
+  margin: 0;
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-main);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+.view-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+/* 封面样式 */
+.cover-layer {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  /* 初始满屏 */
+  overflow: hidden;
+  will-change: height;
+  z-index: 0;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 关键：不变形并填满 */
+  object-position: center;
+  /* 关键：始终显示中心 */
+  display: block;
+}
+
+.dark-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: #000;
+  opacity: 0;
+  z-index: 5;
+  /* 在图片上方，在文字下方 */
+  pointer-events: none;
+  /* 确保它不会阻挡鼠标点击 */
+}
+
+.upper-wrapper {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  height: 50vh;
+  /* 初始占满全屏，确保文字在屏幕正中 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.cover-text {
+  height: 100%;
+  position: absolute;
+  z-index: 11;
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.band-name {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  letter-spacing: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.band-name-img{
+  
+}
+
+.album-name {
+  font-family: var(--font-album);
+  font-size: clamp(2.5rem, 3vw, 3rem);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 核心分割线 */
+.reveal-line {
+  position: absolute;
+  top: 50vh;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #fff;
+  z-index: 20;
+  transform: scaleX(0);
+  /* 初始宽度为0 */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* 下方内容 */
+/* --- 画廊画布基础设置 --- */
+.main-content {
+  background-color: var(--bg-color-deep);
+  min-height: 100vh;
+  max-height: 70vw;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(75, 1fr);
+  grid-auto-rows: calc(100vw / 75);
+  padding: 30px 0;
+  gap: 0;
+  position: relative;
+  z-index: 15;
+}
+
+/* --- 统一的画框与交互样式 --- */
+.gallery-item {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  background-color: #111;
+  /* 图片未加载时的底色 */
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.8s ease;
+  background-color: var(--bg-color-deep);
+  filter: saturate(2.5) grayscale(0.4);
+}
+
+/* 悬停时的原地放大效果（不改变 Grid 布局） */
+.gallery-item:hover {
+  transform: scale(1.08);
+  /* 原地放大 8% */
+  z-index: 50;
+  /* 跑到最上层，压住别人 */
+  box-shadow: 0px 5px 7px rgba(255, 255, 255, 0.1);
+}
+
+.item-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  mix-blend-mode: hue;
+  background: linear-gradient(#351b00 0%, #c76700 50%, #e28400 100%);
+  opacity: 1;
+  backdrop-filter: blur(0.4px);
+  /* 高斯模糊 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+  transition: opacity 0.1s ease;
+  color: #fff;
+}
+
+/* 文字样式 */
+.item-info .title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.item-info .artist {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.item-info .genre {
+  font-size: 0.7rem;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 2px 8px;
+}
+
+/* 视频预览 */
+.preview-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 0.4s ease;
+}
+
+/* --- Hover 交互逻辑 --- */
+.gallery-item:hover {
+  transform: scale(1.1);
+  /* 原地放大 */
+  z-index: 50;
+}
+
+.gallery-item:hover .item-overlay {
+  opacity: 0;
+  /* 遮罩和文字消失 */
+}
+
+.gallery-item:hover .item-overlay {
+  opacity: 0;
+  /* 映射层消失 */
+}
+
+/* --- 8 首歌曲的精准坐标系定位 (16:9 和 9:16) --- */
+/* 算法：长边跨 16 格，短边跨 9 格 */
+
+/* A: 主打横屏 (16x9) */
+.ttpd {
+  grid-area: 21 / 39 / 30 / 55;
+}
+
+/* H: 正方点缀 (9x9) - 在 A 和 B 中间的上方 */
+.gyat {
+  grid-area: 1 / 29 / 10 / 38;
+}
+
+/* B: 主打横屏 (16x9) - 稍微偏低一点 */
+.mol {
+  grid-area: 11 / 22 / 20 / 38;
+}
+
+/* F: 竖屏 1 (9x16) - 穿插在左侧 */
+.e {
+  grid-area: 21 / 29 / 37 / 38;
+}
+
+/* C: 普通横屏 (16x9) - 在正中心 */
+.syail {
+  grid-area: 11 / 49 / 20 / 65;
+}
+
+/* G: 竖屏 2 (9x16) - 穿插在右侧，和 F 错开高度 */
+.csaatw {
+  grid-area: 4 / 39 / 20 / 48;
+}
+
+/* D: 正方形 2 (9x9) - 左下角 */
+.nse {
+  grid-area: 31 / 39 / 40 / 48;
+}
+
+/* E: 普通横屏 (16x9) - 右下角 */
+.fiily {
+  grid-area: 21 / 12 / 30 / 28;
+}
+
+
+/* ========================================= */
+/* 🌟 点击激活 (Focus) 模式的核心样式 🌟 */
+/* ========================================= */
+
+/* 1. 核心穿透魔法：让外层容器变成幽灵，允许点击穿透 */
+.has-active-item .main-content {
+  z-index: 100; 
+  pointer-events: none; /* 🌟 关键：让整个大画框失去物理碰撞，鼠标可以点穿它 */
+}
+
+/* 模糊未激活的项，并且它们也失去点击碰撞 */
+.has-active-item .gallery-item:not(.is-active) {
+  filter: blur(8px) brightness(0.3);
+  pointer-events: none; 
+  transition: filter 0.5s ease;
+}
+
+/* 2. 当前被激活的那个 Item 原地放大，并恢复实体！ */
+.gallery-item.is-active {
+  transform: scale(1.5) !important;
+  transition: transform 0.7s ease;
+  z-index: 100 !important;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  filter: none !important;
+  
+  pointer-events: auto; /* 🌟 关键：单独让激活的这一个恢复点击碰撞，这样能点到控件 */
+  cursor: auto; 
+}
+
+/* 3. 激活状态下视频显现，渐变映射消失 */
+.gallery-item.is-active .preview-video {
+  opacity: 1;
+}
+
+.gallery-item.is-active .item-overlay {
+  opacity: 0;
+  z-index:0;
+}
+
+.gallery-item.is-active img {
+  filter: grayscale(0) saturate(1);
+  opacity: 0; /* 最好隐藏底图，防止视频有黑边漏出底图 */
+}
+
+/* 4. 全局关闭遮罩 */
+.global-close-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 14; /* 🌟 放在 90 层。因为上面 100 层的容器被设为了 none 穿透，所以点击周围空隙会完美落到这里！ */
+  cursor: zoom-out;
+  pointer-events: auto; /* 确保它能接住点击 */
+}
+
+
+
+/* ========================================= */
+/* 🌟 四大区域固定信息面板 (Hover 面板) 🌟 */
+/* ========================================= */
+
+/* 核心特点：防干扰、不可选中、平滑过渡 */
+.info-panel {
+  position: relative;
+  z-index: 10;
+  pointer-events: none; /* 防鼠标干扰，事件穿透 */
+  user-select: none;    /* 防文字被误选中 */
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+  
+  opacity: 0;
+  transform: translateY(15px); /* 初始带有一点下沉 */
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.info-panel.visible {
+  opacity: 1;
+  transform: translateY(0); /* 浮现并归位 */
+}
+
+/* 面板内部文字排版 */
+.info-title {
+  font-family: var(--font-album);
+  font-size: clamp(1.0rem, 1.5vw, 1.5rem);
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  line-height: 1.1;
+  letter-spacing: 1px;
+}
+
+.info-artist {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  margin: 0 0 12px 0;
+  opacity: 0.7;
+}
+
+.info-genre {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border: 0.6px solid rgba(255, 255, 255, 0.3);
+  padding: 4px 10px;
+  width: fit-content;
+}
+
+/* ========================================= */
+/* 📍 定位到 75列 Grid 中的空闲区域 (四个角落) */
+/* ========================================= */
+
+/* 左上角 (TL) */
+.info-tl {
+  grid-area: 2 / 12 / 10 / 28; 
+  text-align: right;
+  align-items: flex-end;
+  justify-content: flex-end; /* 靠底部对齐 */
+}
+
+/* 右上角 (TR) */
+.info-tr {
+  grid-area: 2 / 49 / 10 / 65; 
+  text-align: left;
+  align-items: flex-start;
+  justify-content: flex-end; /* 靠底部对齐 */
+}
+
+/* 左下角 (BL) */
+.info-bl {
+  grid-area: 31 / 12 / 39 / 28; /* 找左下角的空白处 */
+  text-align: right;
+  align-items: flex-end;
+  justify-content: flex-start; /* 靠底部对齐 */
+}
+
+/* 右下角 (BR) */
+.info-br {
+  grid-area: 31 / 49 / 39 / 65; /* 找右下角的空白处 */
+  text-align: left;
+  align-items: flex-start;
+  justify-content: flex-start; /* 靠底部对齐 */
+}
+
+/* 如果有歌曲被点开放大，所有悬浮面板强制隐藏（避免在模糊层中露出来） */
+.has-active-item .info-panel {
+  opacity: 0 !important;
+}
