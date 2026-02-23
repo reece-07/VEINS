@@ -72,7 +72,7 @@ return () => {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename='/VEINS'>
       {/* 用 ScrollManager 包裹你的内容 */}
       <ScrollManager>
         <div
